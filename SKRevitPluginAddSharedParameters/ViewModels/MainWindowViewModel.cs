@@ -1,72 +1,81 @@
-﻿using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Microsoft.Win32;
-using Prism.Commands;
+using SKRevitPluginAddSharedParameters.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using Prism.Commands;
-using Prism.Mvvm;
-//using TextFilesDealer;
-//using WinDialogUtils;
+using System.Windows;
 
 namespace SKRevitPluginAddSharedParameters.ViewModels
 {
-    public class MainWindowViewModel : BindableBase
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
-        public ICommand SelectParameterFile { get; set; }
+        #region PROPERTIES AND FIELDS
+        private ExternalCommandData CommandData { get; set; }
+        private Document Document => CommandData?.Application.ActiveUIDocument.Document;
+        private FamilyManager FamilyManager => Document?.FamilyManager;
+        private bool IsFamilyDocument => Document != null && Document.IsFamilyDocument;
+        private DefinitionFile SharedParamFile => Document?.Application?.OpenSharedParameterFile();
+        private IEnumerable<string[]> _linesFromCSV;
+        #endregion
 
-        public ExternalCommandData CommandData { get; set; }
-
-        public Document Document => this.CommandData?.Application.ActiveUIDocument.Document;
-
-        public Application Application => this.Document?.Application;
-
-        public FamilyManager FamilyManager => this.Document?.FamilyManager;
-
-        public bool IsFamilyDocument => this.Document != null && this.Document.IsFamilyDocument;
-
-        public DefinitionFile SharedParamFile => this.Document?.Application?.OpenSharedParameterFile();
-
-        public DelegateCommand OpenFileCommand { get; private set; }
-        public DelegateCommand AddParametersCommand { get; private set; }
-
-        public MainWindowViewModel() { }
         public MainWindowViewModel(ExternalCommandData commandData)
         {
-            this.CommandData = commandData;
-
-            OpenFileCommand = new DelegateCommand(OpenFile);
-            AddParametersCommand = new DelegateCommand(AddParameters);
+            CommandData = commandData;
         }
 
-        private void OpenFile()
+        #region COMMANDS
+        private RelayCommand _openFileCommand;
+        public RelayCommand OpenFileCommand
         {
-            if (!this.IsFamilyDocument || this.SharedParamFile == null)
-                return;
-
-            string filePath = GetFilePath();
-            if (string.IsNullOrEmpty(filePath))
-                return;
-
-            //foreach (List<string> stringList in new TextData(filePath).ReadFile(';', 0, Encoding.UTF8))
-            var linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(','));
-            foreach (var line  in linesFromCSV)
+            get
             {
-                this.AddSharedParam(line[0], line[1], line[2], line[3]);
+                return _openFileCommand ?? (_openFileCommand = new RelayCommand(obj =>
+                {
+                    if (IsFamilyDocument == false)
+                    {
+                        MessageBox.Show("Open a family. This is not a family file");
+                        return;
+                    }
+
+                    if (SharedParamFile == null)
+                    {
+                        MessageBox.Show("Add shared parameters file");
+                        return;
+                    }
+
+                    string filePath = GetFilePath();
+                    if (string.IsNullOrEmpty(filePath))
+                        return;
+
+                    _linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(';'));
+                }
+                ));
             }
-
         }
 
-        private void AddParameters()
+        private RelayCommand _addParametersCommand;
+        public RelayCommand AddParametersCommand
         {
-            //add method for command
+            get
+            {
+                return _addParametersCommand ?? (_addParametersCommand = new RelayCommand(obj =>
+                {
+                    foreach (var line in _linesFromCSV)
+                    {
+                        AddSharedParam(line[0], line[1], line[2], line[3]);
+                    }
+                    MessageBox.Show("Parameters have been added");
+                }
+                ));
+            }
         }
+        #endregion
 
+        #region METHODS
         private void AddSharedParam(
                                       string parameterName,
                                       string groupName,
@@ -107,6 +116,17 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
             openFileDialog.ShowDialog();
             string filePath = openFileDialog.FileName;
             return filePath;
+        }
+        #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
     }
 }

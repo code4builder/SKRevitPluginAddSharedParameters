@@ -1,8 +1,14 @@
 ﻿using Autodesk.Revit.DB;
+using SKRevitPluginAddSharedParameters.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
+using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.UI;
+using Microsoft.Win32;
+using System.IO;
+using System.Linq;
 
 namespace SKRevitPluginAddSharedParameters.Views
 {
@@ -11,13 +17,12 @@ namespace SKRevitPluginAddSharedParameters.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        Document doc;
-        //List<T> _params;
-        public MainWindow()
+
+        public MainWindow(ExternalCommandData commandData)
         {
             InitializeComponent();
-
-            //doc = document;
+            DataContext = new MainWindowViewModel(commandData);
         }
+
     }
 }

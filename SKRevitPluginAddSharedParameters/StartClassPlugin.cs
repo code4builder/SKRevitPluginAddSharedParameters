@@ -16,7 +16,7 @@ namespace SKRevitPluginAddSharedParameters
             Document doc = commandData.Application.ActiveUIDocument.Document;
 
             MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(commandData);
-            MainWindow mainWindow = new MainWindow();
+            MainWindow mainWindow = new MainWindow(commandData);
 
             mainWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
             mainWindow.ShowDialog();
