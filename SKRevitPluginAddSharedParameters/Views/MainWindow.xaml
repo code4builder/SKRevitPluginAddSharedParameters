@@ -5,21 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:SKRevitPluginAddSharedParameters.Views"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             Width="750"
+             d:DesignHeight="450" d:DesignWidth="750">
     <Window.Resources>
         <ResourceDictionary>
-            <!--<Style TargetType="ListViewItem">
-                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            </Style>
-            <DataTemplate x:Key="CenterAllignmentTemplate">
-                <TextBlock HorizontalAlignment="Center"
-                                   Text="{Binding PipeNominalSize}"/>
-            </DataTemplate>
-            <DataTemplate x:Key="CenterAllignmentTemplateForInsulationThickness">
-                <TextBlock HorizontalAlignment="Center"
-                                   Text="{Binding InsulationThickness}"/>
-            </DataTemplate>-->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
@@ -31,9 +21,27 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="600"/>
+            <ColumnDefinition Width="550"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="PipesListView" 
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0"
+                    Content="Open Excel File"
+                    Command="{Binding Path=OpenFileCommand}"
+                    Width="160"/>
+            <Button Grid.Row="1" 
+                    Content="Add parameters"
+                    Command="{Binding Path=AddParametersCommand}"
+                    Width="160"/>
+        </Grid>
+
+        <ListView x:Name="ParametersListView" 
+                  ItemsSource="{Binding Parameters}"
                   Style="{x:Null}"
                   Grid.Column="1"
                   Grid.Row="0"
@@ -58,31 +66,30 @@
             <ListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn DisplayMemberBinding="{Binding}">
+                        <GridViewColumn DisplayMemberBinding="{Binding ParameterName}" 
+                                        Width="200">
                             <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Name"
-                                                      />
+                                <GridViewColumnHeader Content="Parameter Name"/>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+
+                        <GridViewColumn DisplayMemberBinding="{Binding ParameterGroup}"
+                                        Width="200">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Content="Group"/>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+
+                        <GridViewColumn DisplayMemberBinding="{Binding TypeInstance}"
+                                        Width="100">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Content="Type / Istance"/>
                             </GridViewColumn.Header>
                         </GridViewColumn>
                     </GridView.Columns>
                 </GridView>
             </ListView.View>
         </ListView>
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Button Grid.Row="0"
-                    Content="Open Excel File"
-                    Command="{Binding Path=OpenFileCommand}"
-                    Width="160"/>
-            <Button Grid.Row="1" 
-                    Content="Add parameters"
-                    Command="{Binding Path=AddParametersCommand}"
-                    Width="160"/>
 
-        </Grid>
     </Grid>
 </Window>

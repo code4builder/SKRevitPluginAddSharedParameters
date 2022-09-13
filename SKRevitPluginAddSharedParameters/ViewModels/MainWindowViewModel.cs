@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using SKRevitPluginAddSharedParameters.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,20 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
         private FamilyManager FamilyManager => Document?.FamilyManager;
         private bool IsFamilyDocument => Document != null && Document.IsFamilyDocument;
         private DefinitionFile SharedParamFile => Document?.Application?.OpenSharedParameterFile();
-        private IEnumerable<string[]> _linesFromCSV;
+        public IEnumerable<string[]> linesFromCSV;
+
+        private ObservableCollection<ParameterDefinition> _parameters;
+        public ObservableCollection<ParameterDefinition> Parameters
+        {
+            get
+            {
+                if (_parameters == null)
+                    _parameters = new ObservableCollection<ParameterDefinition>();
+                
+                return _parameters;
+            }
+            set { _parameters = value; }
+        }
         #endregion
 
         public MainWindowViewModel(ExternalCommandData commandData)
@@ -51,7 +65,9 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
                     if (string.IsNullOrEmpty(filePath))
                         return;
 
-                    _linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(';'));
+                    linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(';'));
+                    _parameters.Clear();
+                    GetParameterDefinitions(linesFromCSV);
                 }
                 ));
             }
@@ -64,7 +80,7 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
             {
                 return _addParametersCommand ?? (_addParametersCommand = new RelayCommand(obj =>
                 {
-                    foreach (var line in _linesFromCSV)
+                    foreach (var line in linesFromCSV)
                     {
                         AddSharedParam(line[0], line[1], line[2], line[3]);
                     }
@@ -76,6 +92,16 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
         #endregion
 
         #region METHODS
+
+        private void GetParameterDefinitions(IEnumerable<string[]> linesFromCSV)
+        {
+            foreach (var line in linesFromCSV)
+            {
+                var parameter = new ParameterDefinition(line[0], line[1], line[2], line[3]);
+                _parameters.Add(parameter);
+            }
+        }
+
         private void AddSharedParam(
                                       string parameterName,
                                       string groupName,
