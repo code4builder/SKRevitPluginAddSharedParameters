@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>Add Shared Parameters Plugin</Name>
+		<Assembly>SKRevitPluginAddSharedParameters.dll</Assembly>
+		<AddInId>5ad3cc41-b3bb-4cd0-9be5-e24fdf82994a</AddInId>
+		<FullClassName>SKRevitPluginAddSharedParameters.App</FullClassName>
+		<VendorId>Sergey Kuleshov</VendorId>
+		<VendorDescription>code4builder@gmail.com</VendorDescription>
+	</AddIn>
+</RevitAddIns>
