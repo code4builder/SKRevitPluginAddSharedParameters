@@ -20,7 +20,7 @@ For user interface was used WPF (Windows Presentation Foundation) with Material 
 ## Screenshots
 ![Screenshot1](/../dev/Screenshots/screenshotPluginAddSharerParameters.JPG)
 
-CVS File with parameters will be added. The first row (headers) will be deleted automatically:
+CVS File with parameters must be created. The first row (headers) will be deleted automatically:
 ![Screenshot1](/../dev/Screenshots/screenshotPluginAddSharerParametersCSV.JPG)
 
 ## Video Tutorial
