@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:SKRevitPluginAddSharedParameters.Views"
              mc:Ignorable="d"
              Width="750"
-             d:DesignHeight="450" d:DesignWidth="750">
+             d:DesignHeight="450" d:DesignWidth="790">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -21,7 +21,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
-            <ColumnDefinition Width="550"/>
+            <ColumnDefinition Width="580"/>
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0">
@@ -29,6 +29,8 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <Button Grid.Row="0"
                     Content="Open Excel File"
@@ -38,58 +40,90 @@
                     Content="Add parameters"
                     Command="{Binding Path=AddParametersCommand}"
                     Width="160"/>
-        </Grid>
 
-        <ListView x:Name="ParametersListView" 
+            <Button Command="{Binding WatchTutorialCommand}"
+                    ToolTip="Watch YouTube Video Guide"
+                    Width="160"
+                    Grid.Row="3"
+                    Style="{StaticResource MaterialDesignOutlinedButton}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/SKRevitPluginAddSharedParameters;component/Resources/Logo-YouTube-300x160.png"
+                                   Width="25"/>
+                        <TextBlock Text="Tutorial" 
+                                       Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+
+            <Button Command="{Binding OpenAboutCommand}"
+                    Width="160"
+                    Grid.Row="4"
+                    Style="{StaticResource MaterialDesignOutlinedButton}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="InformationOutline" 
+                                                     HorizontalAlignment="Center"/>
+                        <TextBlock Text="About" 
+                                       Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+
+        </Grid>
+        <ScrollViewer Grid.Column="1"
+                      VerticalScrollBarVisibility="Visible" 
+                      HorizontalScrollBarVisibility="Hidden">
+            <ListView x:Name="ParametersListView" 
                   ItemsSource="{Binding Parameters}"
                   Style="{x:Null}"
-                  Grid.Column="1"
-                  Grid.Row="0"
+                  
                   Margin="4" 
                   AlternationCount="2">
-            <ListView.Resources>
-                <ResourceDictionary>
-                    <Style TargetType="ListViewItem">
-                        <Style.Triggers>
-                            <Trigger Property="ItemsControl.AlternationIndex"  Value="0">
-                                <Setter Property="Background" Value="White" />
-                            </Trigger>
-                            <Trigger Property="ItemsControl.AlternationIndex"  Value="1">
-                                <Setter Property="Background" Value="LightGray" />
-                            </Trigger>
-                        </Style.Triggers>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                    </Style>
+                <ListView.Resources>
+                    <ResourceDictionary>
+                        <Style TargetType="ListViewItem">
+                            <Style.Triggers>
+                                <Trigger Property="ItemsControl.AlternationIndex"  Value="0">
+                                    <Setter Property="Background" Value="White" />
+                                </Trigger>
+                                <Trigger Property="ItemsControl.AlternationIndex"  Value="1">
+                                    <Setter Property="Background" Value="LightGray" />
+                                </Trigger>
+                            </Style.Triggers>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
 
-                </ResourceDictionary>
-            </ListView.Resources>
-            <ListView.View>
-                <GridView>
-                    <GridView.Columns>
-                        <GridViewColumn DisplayMemberBinding="{Binding ParameterName}" 
+                    </ResourceDictionary>
+                </ListView.Resources>
+                <ListView.View>
+                    <GridView>
+                        <GridView.Columns>
+                            <GridViewColumn DisplayMemberBinding="{Binding ParameterName}" 
                                         Width="200">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Parameter Name"/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Parameter Name"/>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
 
-                        <GridViewColumn DisplayMemberBinding="{Binding ParameterGroup}"
+                            <GridViewColumn DisplayMemberBinding="{Binding ParameterGroup}"
                                         Width="200">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Group"/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Group"/>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
 
-                        <GridViewColumn DisplayMemberBinding="{Binding TypeInstance}"
-                                        Width="100">
-                            <GridViewColumn.Header>
-                                <GridViewColumnHeader Content="Type / Istance"/>
-                            </GridViewColumn.Header>
-                        </GridViewColumn>
-                    </GridView.Columns>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                            <GridViewColumn DisplayMemberBinding="{Binding TypeInstance}"
+                                        Width="150">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Type/Istance"/>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </ScrollViewer>
 
     </Grid>
 </Window>
