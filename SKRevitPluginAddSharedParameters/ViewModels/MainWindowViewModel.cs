@@ -19,8 +19,9 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
         private Document Document => CommandData?.Application.ActiveUIDocument.Document;
         private FamilyManager FamilyManager => Document?.FamilyManager;
         private bool IsFamilyDocument => Document != null && Document.IsFamilyDocument;
+        Helper helper = new Helper();
         private DefinitionFile SharedParamFile => Document?.Application?.OpenSharedParameterFile();
-        public IEnumerable<string[]> linesFromCSV;
+        public List<string[]> linesFromCSV = new List<string[]>();
 
         private ObservableCollection<ParameterDefinition> _parameters;
         public ObservableCollection<ParameterDefinition> Parameters
@@ -29,7 +30,7 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
             {
                 if (_parameters == null)
                     _parameters = new ObservableCollection<ParameterDefinition>();
-                
+
                 return _parameters;
             }
             set { _parameters = value; }
@@ -65,7 +66,29 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
                     if (string.IsNullOrEmpty(filePath))
                         return;
 
-                    linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(';'));
+                    linesFromCSV = File.ReadAllLines(filePath).Select(a => a.Split(';')).ToList();
+                    linesFromCSV.RemoveAt(0);
+
+                    //using (StreamReader sr = new StreamReader(filePath))
+                    //{
+                    //    sr.ReadLine();
+                    //    while (sr.Peek() != -1)
+                    //    {
+                    //        string line = sr.ReadLine();
+                    //        string[] lineValues = line.Split(',').ToArray();
+                    //        linesFromExcel.Add(lineValues);
+
+                    //        IEnumerable<string[]> items = new string[] { lineValues };
+                    //        items = items.Concat(new[] { new T("msg2") })
+
+                    //        var myList = new List(items);
+                    //        myList.Add(otherItem);
+
+
+                    //    }
+                    //}
+
+
                     _parameters.Clear();
                     GetParameterDefinitions(linesFromCSV);
                 }
@@ -89,10 +112,36 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
                 ));
             }
         }
+
+        private RelayCommand _watchTutorialCommand;
+        public RelayCommand WatchTutorialCommand
+        {
+            get
+            {
+                return _watchTutorialCommand ?? (_watchTutorialCommand = new RelayCommand(obj =>
+                {
+                    System.Diagnostics.Process.Start("https://www.youtube.com/watch?v=kZI3EjmgSxo");
+                }
+                ));
+            }
+        }
+
+        private RelayCommand _openAboutCommand;
+        public RelayCommand OpenAboutCommand
+        {
+            get
+            {
+                return _openAboutCommand ?? (_openAboutCommand = new RelayCommand(obj =>
+                {
+                    MessageBox.Show("Revit Plugin - Add Shared Parameters \n \nVersion 1.1.0" +
+                                    "\n \nDeveloped by Sergey Kuleshov \n \nEmail: code4builder@google.com");
+                }
+                ));
+            }
+        }
         #endregion
 
         #region METHODS
-
         private void GetParameterDefinitions(IEnumerable<string[]> linesFromCSV)
         {
             foreach (var line in linesFromCSV)
@@ -102,11 +151,10 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
             }
         }
 
-        private void AddSharedParam(
-                                      string parameterName,
-                                      string groupName,
-                                      string paramGroupName,
-                                      string instanceOrTypeValue)
+        private void AddSharedParam(string parameterName,
+                                     string groupName,
+                                     string paramGroupName,
+                                     string instanceOrTypeValue)
         {
             using (Transaction transaction = new Transaction(this.Document, "Add params"))
             {
@@ -124,9 +172,20 @@ namespace SKRevitPluginAddSharedParameters.ViewModels
                         break;
                     }
                 }
-                BuiltInParameterGroup result;
-                if (isExistingParameter || !Enum.TryParse<BuiltInParameterGroup>(paramGroupName, out result))
+
+                if (isExistingParameter)
                     return;
+
+                BuiltInParameterGroup result;
+                string groupRevitApi = helper.parameterGroupsDictionary[paramGroupName];
+
+
+                if (Enum.TryParse<BuiltInParameterGroup>(groupRevitApi, out result) == false)
+                {
+                    Enum.TryParse<BuiltInParameterGroup>("INVALID", out result);
+                    return;
+                }
+
                 bool isInstance = instanceOrTypeValue.Equals("instance");
                 this.FamilyManager.AddParameter(familyDefinition2, result, isInstance);
                 int num2 = (int)transaction.Commit();
