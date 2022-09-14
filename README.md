@@ -1,5 +1,3 @@
-# SKRevitPluginAddSharedParameters
-
 # Revit Plugin - Add Shared Parameters
 ## Introduction
 The 'Add Shared Parameters Plugin' for Autodesk Revit assists users by providing easy way for adding shared parameters.<br />
